@@ -1,6 +1,6 @@
 # Customer Accounts Microservice
 
-![Build Status](https://github.com/<YOUR-USERNAME>/<YOUR-REPO>/actions/workflows/ci-build.yaml/badge.svg)
+![Build Status](https://github.com/shrishtichoudhary24-glitch/Accounts_Project/actions/workflows/ci-build.yaml/badge.svg)
 
 RESTful Customer Accounts service built with Flask, tested with nose, secured with Flask-Talisman and CORS,
 containerized with Docker, and deployed to Kubernetes via a Tekton pipeline.
