@@ -26,5 +26,8 @@ spec:
             httpGet:
               path: /health
               port: 8080
+              httpHeaders:
+                - name: X-Forwarded-Proto
+                  value: https
             initialDelaySeconds: 5
             periodSeconds: 10
