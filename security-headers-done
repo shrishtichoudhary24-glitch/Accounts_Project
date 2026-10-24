@@ -1,0 +1,41 @@
+
+Account model tests
+- App exists
+- Create then find
+- Bad data
+- Serialize and repr
+- Update then delete
+- Update with no id fails
+
+Account service tests
+- Create
+- Create errors
+- Delete
+- Index and health
+- List
+- 405
+- Read
+- Read 404
+- Update
+- Update 404
+
+Security headers and CORS tests
+- CORS header present
+- Talisman headers present
+
+Name                               Stmts   Miss  Cover   Missing
+----------------------------------------------------------------
+service\__init__.py                   14      0   100%
+service\common\__init__.py             0      0   100%
+service\common\error_handlers.py      16      1    94%   29
+service\common\status.py               8      0   100%
+service\config.py                      5      0   100%
+service\models.py                     50      0   100%
+service\routes.py                     55      0   100%
+----------------------------------------------------------------
+TOTAL                                148      1    99%
+----------------------------------------------------------------------
+Ran 18 tests in 0.074s
+
+OK
+
