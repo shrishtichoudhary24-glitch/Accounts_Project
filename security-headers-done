@@ -1,41 +1,37 @@
-
-Account model tests
-- App exists
-- Create then find
-- Bad data
-- Serialize and repr
-- Update then delete
-- Update with no id fails
-
-Account service tests
-- Create
-- Create errors
-- Delete
-- Index and health
-- List
-- 405
-- Read
-- Read 404
-- Update
-- Update 404
-
-Security headers and CORS tests
-- CORS header present
-- Talisman headers present
+[36;1mnosetests -v --with-coverage --cover-package=service --cover-min-percentage=95 tests.test_models tests.test_routes[0m
+nose.config: INFO: Ignoring files matching ['^\\.', '^_', '^setup\\.py$']
+nose.plugins.cover: INFO: Coverage report will include only packages: ['service', 'service']
+App exists ... ok
+Create then find ... ok
+Bad data ... ok
+Serialize and repr ... ok
+Update then delete ... ok
+Update with no id fails ... ok
+Create ... ok
+Create errors ... ok
+Delete ... ok
+Index and health ... ok
+List ... ok
+405 ... ok
+Read ... ok
+Read 404 ... ok
+Update ... ok
+Update 404 ... ok
+CORS header present ... ok
+Talisman headers present ... ok
 
 Name                               Stmts   Miss  Cover   Missing
 ----------------------------------------------------------------
-service\__init__.py                   14      0   100%
-service\common\__init__.py             0      0   100%
-service\common\error_handlers.py      16      1    94%   29
-service\common\status.py               8      0   100%
-service\config.py                      5      0   100%
-service\models.py                     50      0   100%
-service\routes.py                     55      0   100%
+service/__init__.py                   14      0   100%
+service/common/__init__.py             0      0   100%
+service/common/error_handlers.py      16      1    94%   29
+service/common/status.py               8      0   100%
+service/config.py                      5      0   100%
+service/models.py                     50      0   100%
+service/routes.py                     55      0   100%
 ----------------------------------------------------------------
 TOTAL                                148      1    99%
 ----------------------------------------------------------------------
-Ran 18 tests in 0.074s
+Ran 18 tests in 0.109s
 
 OK
-
