@@ -1,0 +1,84 @@
+name: Docker and Kubernetes validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/deploy-check.yaml'
+      - 'Dockerfile'
+      - 'deploy/**'
+      - 'service/**'
+      - 'requirements.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Build the Accounts Docker image
+        run: |
+          docker build --tag accounts:1 .
+          docker images accounts | tee kube-images
+
+      - name: Install kind and kubectl
+        run: |
+          curl --fail --location --output kind-linux-amd64 https://github.com/kubernetes-sigs/kind/releases/download/v0.26.0/kind-linux-amd64
+          curl --fail --location --output kind-linux-amd64.sha256sum https://github.com/kubernetes-sigs/kind/releases/download/v0.26.0/kind-linux-amd64.sha256sum
+          sha256sum --check kind-linux-amd64.sha256sum
+          chmod +x kind-linux-amd64
+          sudo mv kind-linux-amd64 /usr/local/bin/kind
+          curl --fail --location --output kubectl https://dl.k8s.io/release/v1.32.0/bin/linux/amd64/kubectl
+          curl --fail --location --output kubectl.sha256 https://dl.k8s.io/release/v1.32.0/bin/linux/amd64/kubectl.sha256
+          echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+
+      - name: Create a temporary Kubernetes cluster
+        run: kind create cluster --name accounts --wait 180s
+
+      - name: Deploy the built image to Kubernetes
+        run: |
+          kind load docker-image accounts:1 --name accounts
+          sed 's|cluster-registry:5000/accounts:1|accounts:1|' deploy/deployment.yaml | kubectl apply -f -
+          kubectl apply -f deploy/service.yaml
+          kubectl rollout status deployment/accounts --timeout=180s
+          kubectl get deployment,pods,replicasets,services -o wide | tee kube-deploy-accounts
+
+      - name: Verify the deployed application on port 8080
+        run: |
+          kubectl port-forward service/accounts 8080:8080 > port-forward.log 2>&1 &
+          forward_pid=$!
+          trap 'kill "$forward_pid" 2>/dev/null || true' EXIT
+          curl --fail --retry 20 --retry-connrefused --retry-delay 2 --header 'X-Forwarded-Proto: https' http://127.0.0.1:8080/health
+          curl --fail --header 'X-Forwarded-Proto: https' http://127.0.0.1:8080/ --output kube-app-output
+          python3 -c "import json; data=json.load(open('kube-app-output')); assert data['name'] == 'Account REST API Service'; assert data['version'] == '1.0'; print(json.dumps(data, indent=2))"
+
+      - name: Collect application logs
+        if: always()
+        run: |
+          kubectl logs deployment/accounts > accounts-pod.log 2>&1 || true
+          kubectl get pods -o wide || true
+
+      - name: Save deployment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accounts-deployment-evidence
+          path: |
+            kube-app-output
+            kube-images
+            kube-deploy-accounts
+            accounts-pod.log
+            port-forward.log
+          retention-days: 7
+
+      - name: Remove the temporary cluster
+        if: always()
+        run: kind delete cluster --name accounts
