@@ -1,6 +1,8 @@
-# Customer Accounts Microservice
+# devops-capstone-project
 
-![Build Status](https://github.com/shrishtichoudhary24-glitch/Accounts_Project/actions/workflows/ci-build.yaml/badge.svg)
+Customer Accounts Microservice
+
+![Build Status](https://github.com/shrishtichoudhary24-glitch/devops-capstone-project/actions/workflows/ci-build.yaml/badge.svg)
 
 RESTful Customer Accounts service built with Flask, tested with nose, secured with Flask-Talisman and CORS,
 containerized with Docker, and deployed to Kubernetes via a Tekton pipeline.
@@ -19,6 +21,6 @@ containerized with Docker, and deployed to Kubernetes via a Tekton pipeline.
 ```bash
 python3.9 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-nosetests
+nosetests -v --with-coverage --cover-package=service tests.test_models tests.test_routes
 flask --app service run --port 5000
 ```
