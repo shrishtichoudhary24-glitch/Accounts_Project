@@ -9,8 +9,15 @@ app = Flask(__name__)
 app.config.from_object(config)
 
 # Security headers (Talisman) and CORS policy
-talisman = Talisman(app)
-CORS(app)
+talisman = Talisman(
+    app,
+    force_https=True,
+    strict_transport_security=True,
+    frame_options="SAMEORIGIN",
+    referrer_policy="strict-origin-when-cross-origin",
+    content_security_policy={"default-src": "'self'", "object-src": "'none'"},
+)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # pylint: disable=wrong-import-position
 from service import routes, models  # noqa: F401,E402
